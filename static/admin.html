@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" type="text/css" href="/static/admin.css">
+</head>
+<body>
+    <h1>Link Shortener</h1>
+    <form method="post" action="/shorten">
+        <input type="text" name="url" placeholder="Enter your link here...">
+        <button type="submit">Save</button>
+        <input type="text" name="path" placeholder="Enter your path here...">
+        <button type="button">Copy Link</button>
+    </form>
+    <script type="text/javascript">
+        const output = document.getElementById("path");
+        const copyBtn = document.querySelector("#path + button");
+
+        copyBtn.addEventListener("click", () => {
+            const value = window.location.href + output.value;
+            navigator.clipboard.writeText(value);
+        });
+    </script>
+    <script type="text/javascript" src="/static/htmx.min.js"></script>
+</body>
+</html>

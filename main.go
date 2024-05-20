@@ -3,6 +3,7 @@ package main
 import (
 	// "database/sql"
 	"fmt"
+	"link-shortener/auth"
 	"net/http"
 )
 
@@ -16,13 +17,24 @@ func main() {
 	directory := http.Dir("./static")
 	fileServer := http.FileServer(directory)
 
-	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
-	http.HandleFunc("/shorten", linkShortener.Shorten)
-	http.HandleFunc("/{path}", linkShortener.Redirect)
-	http.Handle("/", fileServer)
+	authRouter := http.NewServeMux()
+	authRouter.Handle("GET /admin", fileServer)
+	authRouter.HandleFunc("POST /shorten", linkShortener.Shorten)
+
+	router := http.NewServeMux()
+	router.Handle("/", auth.Middleware(authRouter))
+	router.Handle("GET /", fileServer)
+	router.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
+	router.HandleFunc("GET /{path}", linkShortener.Redirect)
+	router.HandleFunc("POST /login", auth.Login)
+
+	server := http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
 
 	fmt.Printf("Server is running on %s\n", host)
-	http.ListenAndServe(":8080", nil)
+	server.ListenAndServe()
 
 	// database, err := sql.Open("sqlite3", "./links.db")
 	// if err != nil {

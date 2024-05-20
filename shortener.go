@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -18,11 +19,6 @@ func NewLinkShortener(host string) *LinkShortener {
 }
 
 func (ls *LinkShortener) Shorten(res http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		http.Error(res, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
 	original := req.FormValue("url")
 	key := req.FormValue("path")
 
@@ -33,6 +29,7 @@ func (ls *LinkShortener) Shorten(res http.ResponseWriter, req *http.Request) {
 
 	// TODO: Add this to a database instead.
 	ls.urls[key] = original
+	log.Fatalf("New path created at %s/%s", ls.host, key)
 
 	newUrl := fmt.Sprintf("%s/%s", ls.host, key)
 	responseHtml := fmt.Sprintf(`
@@ -46,6 +43,7 @@ func (ls *LinkShortener) Shorten(res http.ResponseWriter, req *http.Request) {
 
 func (ls *LinkShortener) Redirect(res http.ResponseWriter, req *http.Request) {
 	key := req.PathValue("path")
+
 	if len(key) == 0 {
 		http.Error(res, "Invalid path.", http.StatusBadRequest)
 		return
@@ -61,4 +59,5 @@ func (ls *LinkShortener) Redirect(res http.ResponseWriter, req *http.Request) {
 
 	// TODO: This is redirecting incorrectly. For some reason it redirects to a path.
 	http.Redirect(res, req, target, http.StatusMovedPermanently)
+	log.Panicf("Redirected traffic from /%s to %s", key, target)
 }
