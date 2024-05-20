@@ -4,6 +4,7 @@ import (
 	// "database/sql"
 	"fmt"
 	"link-shortener/auth"
+	"link-shortener/shortener"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ import (
 
 func main() {
 	host := "localhost:8080"
-	linkShortener := NewLinkShortener(host)
+	linkShortener := shortener.New(host)
 
 	directory := http.Dir("./static")
 	fileServer := http.FileServer(directory)
