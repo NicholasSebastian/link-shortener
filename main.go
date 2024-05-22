@@ -13,21 +13,25 @@ import (
 
 func main() {
 	host := "localhost:8080"
-	linkShortener := shortener.New(host)
+	router := http.NewServeMux()
 
 	directory := http.Dir("./static")
 	fileServer := http.FileServer(directory)
+	linkShortener := shortener.New(host)
 
-	authRouter := http.NewServeMux()
-	authRouter.Handle("GET /admin", fileServer)
-	authRouter.HandleFunc("POST /shorten", linkShortener.Shorten)
-
-	router := http.NewServeMux()
-	router.Handle("/", auth.Middleware(authRouter))
+	// Regular routes.
 	router.Handle("GET /", fileServer)
 	router.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
 	router.HandleFunc("GET /{path}", linkShortener.Redirect)
-	router.HandleFunc("POST /login", auth.Login)
+	router.HandleFunc("GET /login", auth.Login) // This is a 'GET' request because it will redirect to "/admin".
+
+	// Authenticated routes.
+	router.Handle("POST /shorten", auth.Middleware(linkShortener.Shorten))
+	router.Handle("GET /admin", auth.Middleware(func(w http.ResponseWriter, r *http.Request) {
+		// We handle this route manually because we want to strip away the ".html" from the path.
+		r.URL.Path = "admin.html"
+		fileServer.ServeHTTP(w, r)
+	}))
 
 	server := http.Server{
 		Addr:    ":8080",

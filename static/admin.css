@@ -36,8 +36,14 @@ form > button:last-child {
 }
 
 button {
-  cursor: pointer;
   text-wrap: nowrap;
+  transition: all linear 100ms;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: #ccc;
+  color: #000;
 }
 
 input, button {

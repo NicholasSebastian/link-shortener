@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Middleware(next http.Handler) http.Handler {
+func Middleware(next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		authHeader := req.Header.Get("Authorization")
 		log.Println(authHeader) // For debugging only.

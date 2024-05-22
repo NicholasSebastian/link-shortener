@@ -1,4 +1,4 @@
-package main
+package model
 
 // TODO: This is for future database implementation.
 

@@ -3,6 +3,7 @@ package shortener
 import (
 	"log"
 	"net/http"
+	"net/url"
 )
 
 func (ls *LinkShortener) Redirect(res http.ResponseWriter, req *http.Request) {
@@ -20,8 +21,12 @@ func (ls *LinkShortener) Redirect(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, "Path does not exist.", http.StatusNotFound)
 		return
 	}
+	if _, err := url.ParseRequestURI(target); err != nil {
+		http.Error(res, "The target is not a valid URL.", http.StatusTeapot)
+		return
+	}
 
 	// TODO: This is redirecting incorrectly. For some reason it redirects to a path.
 	http.Redirect(res, req, target, http.StatusMovedPermanently)
-	log.Panicf("Redirected traffic from /%s to %s", key, target)
+	log.Printf("Redirected traffic from /%s to %s", key, target)
 }
