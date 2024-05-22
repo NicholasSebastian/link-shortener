@@ -23,7 +23,9 @@ func main() {
 	router.Handle("GET /", fileServer)
 	router.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
 	router.HandleFunc("GET /{path}", linkShortener.Redirect)
-	router.HandleFunc("GET /login", auth.Login) // This is a 'GET' request because it will redirect to "/admin".
+	router.HandleFunc("GET /login", auth.Login)
+	// This is a 'GET' request because it will redirect to "/admin".
+	// TODO: This should be a 'POST' request so that the credentials won't show up in the URL.
 
 	// Authenticated routes.
 	router.Handle("POST /shorten", auth.Middleware(linkShortener.Shorten))
