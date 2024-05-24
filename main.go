@@ -25,7 +25,7 @@ func main() {
 
 	router := http.NewServeMux()
 	fileServer := http.FileServer(directory)
-	linkShortener := shortener.New()
+	linkShortener := shortener.New() // TODO: Pass a reference to the database in here.
 
 	// Regular routes.
 	router.Handle("GET /", fileServer)
