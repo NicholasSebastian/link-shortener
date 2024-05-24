@@ -25,7 +25,7 @@ func Login(res http.ResponseWriter, req *http.Request) {
 	} else {
 		res.WriteHeader(http.StatusUnauthorized)
 		res.Header().Set("Content-Type", "text/html")
-		fmt.Fprintf(res, `<div id="error-box">Incorrect password.</div>`)
+		fmt.Fprintf(res, `<div id="error-box">Incorrect credentials.</div>`)
 
 		if ip == "" {
 			log.Printf("Failed login attempt: %q and %q\n", username, password)
@@ -37,7 +37,9 @@ func Login(res http.ResponseWriter, req *http.Request) {
 }
 
 func getIpAddress(req *http.Request) string {
-	ip := (func() string {
+	const IP_SEPARATOR = ", "
+
+	ip := (func() string { // Pseudo match statement.
 		if ip := req.Header.Get("X-Real-Ip"); ip != "" {
 			return ip
 		}
@@ -50,6 +52,6 @@ func getIpAddress(req *http.Request) string {
 		return ""
 	})()
 
-	ips := strings.Split(ip, ", ")
+	ips := strings.Split(ip, IP_SEPARATOR)
 	return ips[0]
 }

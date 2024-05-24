@@ -26,7 +26,6 @@ func (ls *LinkShortener) Redirect(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO: This is redirecting incorrectly. For some reason it redirects to a path.
 	http.Redirect(res, req, target, http.StatusMovedPermanently)
 	log.Printf("Redirected traffic from /%s to %s", key, target)
 }

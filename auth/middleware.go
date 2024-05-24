@@ -5,12 +5,17 @@ import (
 	"net/http"
 )
 
-func Middleware(next http.HandlerFunc) http.Handler {
+func Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		authHeader := req.Header.Get("Authorization")
-		log.Println(authHeader) // For debugging only.
+		log.Printf("Authorization: %q", authHeader) // For debugging only.
 
-		// TODO
+		// TODO: Implementation.
 		next.ServeHTTP(res, req)
 	})
+}
+
+func MiddlewareFunc(next http.HandlerFunc) http.Handler {
+	nextFunc := http.HandlerFunc(next)
+	return Middleware(nextFunc)
 }
