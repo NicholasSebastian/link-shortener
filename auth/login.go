@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"link-shortener/utils"
 	"log"
 	"net/http"
 	"strings"
@@ -16,14 +17,14 @@ func Login(res http.ResponseWriter, req *http.Request) {
 	authenticated := username == "test" && password == "test123"
 
 	if authenticated {
-		http.Redirect(res, req, "/admin", http.StatusTemporaryRedirect)
+		res.Header().Set("HX-Redirect", "/admin")
+
 		// TODO: Implant the auth token into the client's cookie.
 
 		if ip != "" {
 			log.Printf("User %q logged in from %s\n", username, ip)
 		}
 	} else {
-		res.WriteHeader(http.StatusUnauthorized)
 		res.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(res, `<div id="error-box">Incorrect credentials.</div>`)
 
@@ -37,21 +38,14 @@ func Login(res http.ResponseWriter, req *http.Request) {
 }
 
 func getIpAddress(req *http.Request) string {
+	ip := utils.Fallback(
+		req.Header.Get("X-Real-Ip"),
+		req.Header.Get("X-Forwarded-For"),
+		req.RemoteAddr,
+	)
+
 	const IP_SEPARATOR = ", "
-
-	ip := (func() string { // Pseudo match statement.
-		if ip := req.Header.Get("X-Real-Ip"); ip != "" {
-			return ip
-		}
-		if ip := req.Header.Get("X-Forwarded-For"); ip != "" {
-			return ip
-		}
-		if ip := req.RemoteAddr; ip != "" {
-			return ip
-		}
-		return ""
-	})()
-
 	ips := strings.Split(ip, IP_SEPARATOR)
+
 	return ips[0]
 }

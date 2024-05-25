@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"link-shortener/auth"
 	"link-shortener/shortener"
+	"link-shortener/utils"
 	"log"
 	"net/http"
 )
 
+// TODO: HTMX implementation.
 // TODO: Database implementation.
-// TODO: Page with form and HTMX implementation.
+// TODO: Implement tests.
 
 func main() {
 	// database, err := sql.Open("sqlite3", "./links.db")
@@ -19,23 +21,24 @@ func main() {
 	// }
 	// defer database.Close()
 
-	directory := htmlDir{
-		dir: http.Dir("./static"),
+	directory := http.Dir("./static")
+	htmlDirectory := utils.HtmlDir{
+		Dir: &directory,
 	}
 
 	router := http.NewServeMux()
-	fileServer := http.FileServer(directory)
+	fileServer := http.FileServer(htmlDirectory)
 	linkShortener := shortener.New() // TODO: Pass a reference to the database in here.
 
 	// Regular routes.
 	router.Handle("GET /", fileServer)
 	router.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
 	router.HandleFunc("GET /{path}", linkShortener.Redirect)
+	router.HandleFunc("GET /logout", auth.Logout)
 	router.HandleFunc("POST /login", auth.Login)
 
 	// Authenticated routes.
 	router.Handle("GET /admin", auth.Middleware(fileServer))
-	router.Handle("POST /admin", auth.Middleware(fileServer)) // To handle redirects from logins.
 	router.Handle("POST /shorten", auth.MiddlewareFunc(linkShortener.Shorten))
 
 	server := http.Server{
