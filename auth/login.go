@@ -2,11 +2,13 @@ package auth
 
 import (
 	"fmt"
-	"link-shortener/utils"
 	"log"
 	"net/http"
-	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
 )
+
+const key = ""
 
 func Login(res http.ResponseWriter, req *http.Request) {
 	username := req.FormValue("username")
@@ -17,16 +19,26 @@ func Login(res http.ResponseWriter, req *http.Request) {
 	authenticated := username == "test" && password == "test123"
 
 	if authenticated {
-		res.Header().Set("HX-Redirect", "/admin")
+		claims := jwt.MapClaims{
+			"username": username,
+		}
 
-		// TODO: Implant the auth token into the client's cookie.
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenstr, err := token.SignedString(key)
+		if err != nil {
+			// TODO: Respond with a server error.
+			return
+		}
+
+		setAuthCookie(&res, tokenstr)
+		res.Header().Set("HX-Redirect", "/admin")
 
 		if ip != "" {
 			log.Printf("User %q logged in from %s\n", username, ip)
 		}
 	} else {
 		res.Header().Set("Content-Type", "text/html")
-		fmt.Fprintf(res, `<div id="error-box">Incorrect credentials.</div>`)
+		fmt.Fprintf(res, `<div>Incorrect credentials.</div>`)
 
 		if ip == "" {
 			log.Printf("Failed login attempt: %q and %q\n", username, password)
@@ -35,17 +47,4 @@ func Login(res http.ResponseWriter, req *http.Request) {
 			log.Printf("Failed login attempt: %q and %q from %s\n", username, password, ip)
 		}
 	}
-}
-
-func getIpAddress(req *http.Request) string {
-	ip := utils.Fallback(
-		req.Header.Get("X-Real-Ip"),
-		req.Header.Get("X-Forwarded-For"),
-		req.RemoteAddr,
-	)
-
-	const IP_SEPARATOR = ", "
-	ips := strings.Split(ip, IP_SEPARATOR)
-
-	return ips[0]
 }

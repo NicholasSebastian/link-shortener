@@ -46,3 +46,12 @@ input, button {
   border-radius: 4px;
   padding: 10px 20px;
 }
+
+#error-area > div {
+  background-color: pink;
+  color: red;
+  border: 1px solid red;
+  margin: 20px auto 0;
+  padding: 4px 8px;
+  width: fit-content;
+}

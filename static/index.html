@@ -7,11 +7,12 @@
     <link rel="stylesheet" type="text/css" href="/static/index.css">
 </head>
 <body>
-    <form hx-post="/login" hx-swap="afterend">
+    <form hx-post="/login" hx-target="#error-area" hx-swap="innerHTML">
         <input type="text" name="username" placeholder="Username">
         <input type="text" name="password" placeholder="Password">
         <button type="submit">Login</button>
     </form>
+    <div id="error-area"></div>
     <script type="text/javascript" src="/static/htmx.min.js"></script>
 </body>
 </html>
