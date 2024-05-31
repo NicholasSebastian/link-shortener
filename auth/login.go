@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const key = ""
+const secretKey = "" // TODO: Retrieve the secret key from the environment variables instead.
 
 func Login(res http.ResponseWriter, req *http.Request) {
 	username := req.FormValue("username")
@@ -24,7 +24,7 @@ func Login(res http.ResponseWriter, req *http.Request) {
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenstr, err := token.SignedString(key)
+		tokenstr, err := token.SignedString(secretKey)
 		if err != nil {
 			// TODO: Respond with a server error.
 			return
