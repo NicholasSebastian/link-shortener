@@ -11,3 +11,7 @@ func setAuthCookie(res *http.ResponseWriter, token string) {
 
 	http.SetCookie(*res, &cookie)
 }
+
+func removeAuthCookie(res *http.ResponseWriter) {
+	// TODO
+}

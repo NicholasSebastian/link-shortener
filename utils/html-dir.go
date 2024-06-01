@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-// Overrides the default filesystem behavior by falling back to '.html'.
+// Overrides the default filesystem behavior to make routes fallback to '.html'.
 // I don't know why this isn't the default behaviour for a HTTP static file server.
 
 type HtmlDir struct {

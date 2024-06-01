@@ -48,3 +48,8 @@ func Login(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 }
+
+func Logout(res http.ResponseWriter, req *http.Request) {
+	removeAuthCookie(&res)
+	// TODO: Redirect the client to the login page.
+}
