@@ -13,6 +13,7 @@ import (
 // TODO: HTMX implementation.
 // TODO: Database implementation.
 // TODO: Implement tests.
+// TODO: Write the server logs into the database.
 
 func main() {
 	// database, err := sql.Open("sqlite3", "./links.db")

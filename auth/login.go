@@ -21,25 +21,31 @@ func Login(res http.ResponseWriter, req *http.Request) {
 	if authenticated {
 		claims := jwt.MapClaims{
 			"username": username,
+			// TODO: Include the current time here.
 		}
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 		tokenstr, err := token.SignedString(secretKey)
+
 		if err != nil {
-			// TODO: Respond with a server error.
-			return
-		}
+			res.Header().Set("Content-Type", "text/html")
+			fmt.Fprintf(res, `<div>Server Error.</div>`)
+		} else {
+			setAuthCookie(&res, tokenstr)
+			res.Header().Set("HX-Redirect", "/admin")
 
-		setAuthCookie(&res, tokenstr)
-		res.Header().Set("HX-Redirect", "/admin")
-
-		if ip != "" {
-			log.Printf("User %q logged in from %s\n", username, ip)
+			// TODO: Log to the database instead.
+			if ip == "" {
+				log.Printf("User %q logged in\n", username)
+			} else {
+				log.Printf("User %q logged in from %s\n", username, ip)
+			}
 		}
 	} else {
 		res.Header().Set("Content-Type", "text/html")
 		fmt.Fprintf(res, `<div>Incorrect credentials.</div>`)
 
+		// TODO: Log to the database instead.
 		if ip == "" {
 			log.Printf("Failed login attempt: %q and %q\n", username, password)
 		} else {

@@ -24,8 +24,14 @@ func Middleware(next http.Handler) http.Handler {
 
 		token, err := jwt.Parse(tokenstr, keyFunc)
 		if err != nil {
-			fmt.Fprint(res, err.Error())
-			res.WriteHeader(http.StatusBadRequest)
+			res.Header().Set("HX-Redirect", "/")
+
+			// TODO: Log to the database instead.
+			log.Printf("Server Error: Failed to parse JWT token %q\n", tokenstr)
+			log.Println(err.Error())
+
+			next.ServeHTTP(res, req)
+			return
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
